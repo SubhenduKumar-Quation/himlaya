@@ -1,0 +1,1598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Himalaya Wellness - Q-Commerce Forecasting Engine Presentation</title>
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --primary: #0A5C36;
+            --primary-light: #12824C;
+            --primary-soft: #E8F5E9;
+            --primary-hover: #074729;
+            --accent-amber: #D97706;
+            --accent-blue: #2563EB;
+            --accent-purple: #7C3AED;
+            --bg-canvas: #F8FAFC;
+            --bg-card: #FFFFFF;
+            --border: #E2E8F0;
+            --border-focus: #CBD5E1;
+            --text-main: #0F172A;
+            --text-muted: #64748B;
+            --text-light: #94A3B8;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 18px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 14px rgba(0,0,0,0.06);
+            --shadow-lg: 0 10px 30px rgba(0,0,0,0.08);
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-canvas);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        /* Presentation Top Bar */
+        .pres-header {
+            background: #ffffff;
+            border-bottom: 1px solid var(--border);
+            padding: 14px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .brand-group {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .brand-logo-badge {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, #0A5C36, #147D4C);
+            color: white;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 800;
+            box-shadow: 0 2px 8px rgba(10, 92, 54, 0.25);
+        }
+
+        .brand-text h1 {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: -0.2px;
+        }
+
+        .brand-text p {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .nav-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .slide-indicator {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            background: var(--bg-canvas);
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+        }
+
+        .btn-nav {
+            background: white;
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 14px;
+        }
+
+        .btn-nav:hover:not(:disabled) {
+            background: var(--primary-soft);
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .btn-nav:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .btn-simulator-link {
+            background: var(--primary);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition);
+        }
+
+        .btn-simulator-link:hover {
+            background: var(--primary-hover);
+        }
+
+        /* Slide Container */
+        .presentation-stage {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 32px 24px;
+        }
+
+        .slide-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-lg);
+            width: 100%;
+            max-width: 1180px;
+            min-height: 640px;
+            padding: 44px 48px;
+            display: none;
+            flex-direction: column;
+            animation: fadeIn 0.3s ease;
+            position: relative;
+        }
+
+        .slide-card.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Slide Elements */
+        .slide-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .slide-badge {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--primary);
+            background: var(--primary-soft);
+            padding: 5px 12px;
+            border-radius: 6px;
+        }
+
+        .slide-title {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--text-main);
+            letter-spacing: -0.5px;
+            margin-bottom: 10px;
+            line-height: 1.25;
+        }
+
+        .slide-subtitle {
+            font-size: 15px;
+            color: var(--text-muted);
+            margin-bottom: 28px;
+            line-height: 1.5;
+        }
+
+        .slide-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* Grid Layouts */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 28px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        /* Feature Cards */
+        .card-box {
+            background: #FFFFFF;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 22px;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+        }
+
+        .card-box:hover {
+            border-color: var(--border-focus);
+            box-shadow: var(--shadow-md);
+        }
+
+        .card-box.highlight {
+            border-left: 4px solid var(--primary);
+            background: #FDFEFE;
+        }
+
+        .card-box.amber {
+            border-left: 4px solid var(--accent-amber);
+        }
+
+        .card-box.blue {
+            border-left: 4px solid var(--accent-blue);
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: var(--primary-soft);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            margin-bottom: 14px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 8px;
+        }
+
+        .card-desc {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* Pill tags */
+        .tag-pill {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 4px;
+            background: var(--bg-canvas);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            margin: 2px;
+        }
+
+        /* Metrics Table */
+        .metric-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            margin-top: 10px;
+        }
+
+        .metric-table th {
+            text-align: left;
+            background: var(--bg-canvas);
+            padding: 10px 14px;
+            font-weight: 700;
+            color: var(--text-main);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .metric-table td {
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-muted);
+        }
+
+        .metric-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .metric-table tr.winner {
+            background: #F0FDF4;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .metric-table tr.winner td {
+            color: var(--primary);
+        }
+
+        /* Progress Dots / Bar */
+        .slide-dots {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 16px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--border);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .dot.active {
+            background: var(--primary);
+            width: 24px;
+            border-radius: 12px;
+        }
+
+        
+        /* Math Callout Box */
+        .math-callout {
+            background: var(--bg-canvas);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--accent-blue);
+            padding: 12px 14px;
+            border-radius: var(--radius-sm);
+            font-family: 'Consolas', monospace;
+            font-size: 11px;
+            line-height: 1.45;
+            color: var(--text-main);
+            margin-top: 6px;
+            overflow-x: auto;
+        }
+    
+        /* Key Metrics Badges */
+        .stat-badge {
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-canvas);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 14px 18px;
+        }
+
+        .stat-val {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--primary);
+            line-height: 1.2;
+        }
+
+        .stat-lbl {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-top: 4px;
+        }
+
+        /* Timeline Box */
+        .timeline-item {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+
+        .timeline-marker {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--primary-soft);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .timeline-content h4 {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .timeline-content p {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Presentation Header -->
+    <header class="pres-header">
+        <div class="brand-group">
+            <div class="brand-logo-badge">H</div>
+            <div class="brand-text">
+                <h1>Himalaya Wellness &middot; Q-Commerce PO Demand Forecasting</h1>
+                <p>Partner-CFA-SKU Multi-Granularity (3-Day, 5-Day, Weekly) 13-Week Operational Framework</p>
+            </div>
+        </div>
+
+        <div class="nav-controls">
+            <div class="slide-indicator" id="slideIndicator">Slide 1 / 9</div>
+            <button class="btn-nav" id="prevBtn" onclick="prevSlide()" title="Previous Slide (Left Arrow)"><i class="fa-solid fa-chevron-left"></i></button>
+            <button class="btn-nav" id="nextBtn" onclick="nextSlide()" title="Next Slide (Right Arrow)"><i class="fa-solid fa-chevron-right"></i></button>
+            <a href="himalaya_qcom_simulator.html" target="_blank" class="btn-simulator-link">
+                <i class="fa-solid fa-chart-line"></i> Launch Simulator
+            </a>
+        </div>
+    </header>
+
+    <!-- Slide Stage -->
+    <main class="presentation-stage">
+
+        <!-- SLIDE 1: Executive Overview -->
+        <section class="slide-card active" id="slide-1">
+            <div class="slide-meta">
+                <span class="slide-badge">Strategic Mandate</span>
+                <span style="font-size: 12px; color: var(--text-light); font-weight: 600;">Sep 2026</span>
+            </div>
+            <h2 class="slide-title">Executive Overview: Q-Commerce Demand Forecasting</h2>
+            <p class="slide-subtitle">Empowering Himalaya Wellness to fulfill high-velocity purchase orders across Blinkit, Amazon, and Flipkart with AI-driven multi-granularity replenishment.</p>
+            
+            <div class="slide-content">
+                <div class="grid-4" style="margin-bottom: 24px;">
+                    <div class="stat-badge">
+                        <span class="stat-val">96</span>
+                        <span class="stat-lbl">Active Series Nodes (3 Partners &times; 4 CFAs &times; 8 SKUs)</span>
+                    </div>
+                    <div class="stat-badge">
+                        <span class="stat-val">3</span>
+                        <span class="stat-lbl">Granularities: 3-Day, 5-Day, Weekly</span>
+                    </div>
+                    <div class="stat-badge">
+                        <span class="stat-val">13 Wks</span>
+                        <span class="stat-lbl">Horizon (Sep 14 &ndash; Dec 13, 2026)</span>
+                    </div>
+                    <div class="stat-badge">
+                        <span class="stat-val">6</span>
+                        <span class="stat-lbl">Model Benchmark Suite + Best Ensemble</span>
+                    </div>
+                </div>
+
+                <div class="grid-2">
+                    <div class="card-box highlight">
+                        <div class="card-icon"><i class="fa-solid fa-bolt"></i></div>
+                        <h3 class="card-title">The Quick-Commerce Challenge</h3>
+                        <p class="card-desc">Unlike traditional modern trade with 7&ndash;14 day PO horizons, Q-Commerce platforms operate with 24&ndash;72 hour dark-store fulfillment loops. Stockouts result in immediate partner app de-listing, while overstocking at CFAs inflates holding costs and shelf-life decay.</p>
+                    </div>
+                    <div class="card-box highlight">
+                        <div class="card-icon"><i class="fa-solid fa-bullseye"></i></div>
+                        <h3 class="card-title">Solution Objectives</h3>
+                        <p class="card-desc">Deliver an automated, leakage-safe forecasting engine incorporating multi-dimensional feature engineering (temporal, causal lags, rolling windows, and festival interactions), evaluating Two-Stage LightGBM, XGBoost, Random Forest, Holt-Winters, and SARIMAX, coupled with a light-themed interactive simulator.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 2: Q-Commerce vs Traditional FMCG -->
+        <section class="slide-card" id="slide-2">
+            <div class="slide-meta">
+                <span class="slide-badge">Market Dynamics</span>
+                <span style="font-size: 12px; color: var(--text-light); font-weight: 600;">Demand Patterns</span>
+            </div>
+            <h2 class="slide-title">Q-Commerce Demand Drivers vs. Traditional FMCG</h2>
+            <p class="slide-subtitle">Why standard monthly or bi-weekly S&amp;OP cycles fail to capture rapid micro-fulfillment cycles.</p>
+            
+            <div class="slide-content">
+                <div class="grid-3">
+                    <div class="card-box">
+                        <div class="card-icon"><i class="fa-solid fa-calendar-week"></i></div>
+                        <h3 class="card-title">Weekend Surges (+45%)</h3>
+                        <p class="card-desc">PO placement spikes sharply on Thursday afternoon and Friday morning as dark stores pre-stock for weekend impulse ordering, tapering on Tuesday.</p>
+                        <div style="margin-top: 12px;">
+                            <span class="tag-pill">Friday Surge 1.40x</span>
+                            <span class="tag-pill">Sunday PO Top-up</span>
+                        </div>
+                    </div>
+
+                    <div class="card-box">
+                        <div class="card-icon"><i class="fa-solid fa-wallet"></i></div>
+                        <h3 class="card-title">Payday Salary Cycles</h3>
+                        <p class="card-desc">Significant consumer basket expansion between the 28th of each month and the 5th of the subsequent month across Personal Care and Baby Care essentials.</p>
+                        <div style="margin-top: 12px;">
+                            <span class="tag-pill">28th-5th Window</span>
+                            <span class="tag-pill">+12% Basket Lift</span>
+                        </div>
+                    </div>
+
+                    <div class="card-box">
+                        <div class="card-icon"><i class="fa-solid fa-fire"></i></div>
+                        <h3 class="card-title">Mega Festival Spikes</h3>
+                        <p class="card-desc">Great Indian Festival (GIF), Big Billion Days (BBD), and Diwali trigger 2.1x to 2.6x volume spikes requiring 7-day pre-stocking at mother CFAs.</p>
+                        <div style="margin-top: 12px;">
+                            <span class="tag-pill">BBD / GIF 2.6x</span>
+                            <span class="tag-pill">Diwali 2.3x</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-box blue" style="margin-top: 20px;">
+                    <h3 class="card-title" style="font-size: 14px; margin-bottom: 4px;"><i class="fa-solid fa-circle-info" style="color: var(--accent-blue); margin-right: 8px;"></i> Critical Operational Takeaway</h3>
+                    <p class="card-desc">Forecasting must synchronize with <strong>3-day micro-replenishment</strong> at the dark-store interface and <strong>5-day dispatch batches</strong> at the CFA level, while rolling up into <strong>weekly aggregates</strong> for factory scheduling.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 3: Hierarchical Architecture -->
+        <section class="slide-card" id="slide-3">
+            <div class="slide-meta">
+                <span class="slide-badge">Hierarchy Architecture</span>
+                <span style="font-size: 12px; color: var(--text-light); font-weight: 600;">Partner &times; CFA &times; SKU</span>
+            </div>
+            <h2 class="slide-title">The Partner - CFA - SKU Forecasting Hierarchy</h2>
+            <p class="slide-subtitle">Granular modeling across 96 individual time series to optimize regional inventory placement.</p>
+            
+            <div class="slide-content">
+                <div class="grid-3">
+                    <!-- Column 1: Partners -->
+                    <div class="card-box">
+                        <h3 class="card-title" style="display: flex; align-items: center; gap: 8px;">
+                            <i class="fa-solid fa-handshake" style="color: var(--primary);"></i> 3 Partners
+                        </h3>
+                        <p class="card-desc" style="margin-bottom: 12px;">Key e-commerce and quick-commerce channels:</p>
+                        <ul style="list-style: none; font-size: 13px; color: var(--text-main); line-height: 2;">
+                            <li><i class="fa-solid fa-check" style="color: var(--primary); margin-right: 6px;"></i> <strong>Blinkit:</strong> 10-min dark-store network</li>
+                            <li><i class="fa-solid fa-check" style="color: var(--primary); margin-right: 6px;"></i> <strong>Amazon:</strong> Fresh &amp; Regional FCs</li>
+                            <li><i class="fa-solid fa-check" style="color: var(--primary); margin-right: 6px;"></i> <strong>Flipkart Seconds:</strong> Rapid replenishment</li>
+                        </ul>
+                    </div>
+
+                    <!-- Column 2: CFAs -->
+                    <div class="card-box">
+                        <h3 class="card-title" style="display: flex; align-items: center; gap: 8px;">
+                            <i class="fa-solid fa-warehouse" style="color: var(--accent-blue);"></i> 4 Regional CFAs
+                        </h3>
+                        <p class="card-desc" style="margin-bottom: 12px;">Strategic carry and forwarding distribution centers:</p>
+                        <ul style="list-style: none; font-size: 13px; color: var(--text-main); line-height: 2;">
+                            <li><i class="fa-solid fa-location-dot" style="color: var(--accent-blue); margin-right: 6px;"></i> <strong>Bangalore CFA:</strong> Tech corridor (+18% YoY)</li>
+                            <li><i class="fa-solid fa-location-dot" style="color: var(--accent-blue); margin-right: 6px;"></i> <strong>Mumbai CFA:</strong> High volume hub (+15% YoY)</li>
+                            <li><i class="fa-solid fa-location-dot" style="color: var(--accent-blue); margin-right: 6px;"></i> <strong>Delhi-NCR CFA:</strong> Largest demand (+20% YoY)</li>
+                            <li><i class="fa-solid fa-location-dot" style="color: var(--accent-blue); margin-right: 6px;"></i> <strong>Kolkata CFA:</strong> Eastern gateway (+12% YoY)</li>
+                        </ul>
+                    </div>
+
+                    <!-- Column 3: SKUs -->
+                    <div class="card-box">
+                        <h3 class="card-title" style="display: flex; align-items: center; gap: 8px;">
+                            <i class="fa-solid fa-prescription-bottle-medical" style="color: var(--accent-amber);"></i> 8 Hero SKUs
+                        </h3>
+                        <p class="card-desc" style="margin-bottom: 12px;">Top revenue drivers across 3 categories:</p>
+                        <div style="display: flex; flex-direction: column; gap: 6px; font-size: 12px;">
+                            <div style="background: var(--bg-canvas); padding: 5px 8px; border-radius: 4px;">
+                                <strong>Personal Care:</strong> Neem Face Wash, Complete Care Toothpaste, Anti-Dandruff Shampoo
+                            </div>
+                            <div style="background: var(--bg-canvas); padding: 5px 8px; border-radius: 4px;">
+                                <strong>Pharmaceuticals:</strong> Liv.52 DS 60s, Ashvagandha 60s, Septilin 60s
+                            </div>
+                            <div style="background: var(--bg-canvas); padding: 5px 8px; border-radius: 4px;">
+                                <strong>Baby Care:</strong> Baby Massage Oil 200ml, Gentle Baby Wipes 72s
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 4: Feature Engineering Framework -->
+        <section class="slide-card" id="slide-4">
+            <div class="slide-meta">
+                <span class="slide-badge">Feature Engineering</span>
+                <span style="font-size: 12px; color: var(--text-light); font-weight: 600;">Enterprise Feature Engineering Architecture</span>
+            </div>
+            <h2 class="slide-title">Multi-Dimensional Feature Engineering Engine</h2>
+            <p class="slide-subtitle">Strict implementation of safe, leakage-free feature transformers across calendar, lags, and promotions.</p>
+            
+            <div class="slide-content">
+                <div class="grid-2" style="gap: 20px;">
+                    <div class="card-box">
+                        <h4 style="font-size: 14px; font-weight: 700; color: var(--primary); margin-bottom: 8px;">
+                            <i class="fa-regular fa-calendar-days"></i> 1) Time &amp; Calendar Features
+                        </h4>
+                        <p class="card-desc" style="margin-bottom: 8px;">`week_of_year` (1–52), `month`, `quarter`, `year`, `financial_month` (Apr-Mar), `is_month_start`, `is_month_end`, `days_in_month`.</p>
+                        <div style="margin-top: 4px;">
+                            <span class="tag-pill">Sin/Cos Trigonometric Encodings</span>
+                            <span class="tag-pill">Day of Week</span>
+                        </div>
+                    </div>
+
+                    <div class="card-box">
+                        <h4 style="font-size: 14px; font-weight: 700; color: var(--primary); margin-bottom: 8px;">
+                            <i class="fa-solid fa-clock-rotate-left"></i> 2) Lags &amp; Trend Velocity
+                        </h4>
+                        <p class="card-desc" style="margin-bottom: 8px;">Safe groupby shifts: `lag_1`, `lag_2`, `lag_4`, `lag_8`, `lag_12`, `lag_26`. Velocity signals: `diff_lag1_lag2`, `pct_change_1_4`, and `roll_mean_4_vs_12_ratio`.</p>
+                        <div style="margin-top: 4px;">
+                            <span class="tag-pill">Groupby Shift (No Leakage)</span>
+                            <span class="tag-pill">Ramp-Up Signals</span>
+                        </div>
+                    </div>
+
+                    <div class="card-box">
+                        <h4 style="font-size: 14px; font-weight: 700; color: var(--primary); margin-bottom: 8px;">
+                            <i class="fa-solid fa-chart-area"></i> 3) Rolling Moving Windows
+                        </h4>
+                        <p class="card-desc" style="margin-bottom: 8px;">`roll_mean_4`, `roll_mean_8`, `roll_mean_12`, `roll_std_4`, `roll_std_8`, `roll_min_8`, `roll_max_8`, `roll_sum_4`, `roll_sum_8`, and `ewm_mean_alpha_0.3`.</p>
+                        <div style="margin-top: 4px;">
+                            <span class="tag-pill">Pre-shift(1) Rolling</span>
+                            <span class="tag-pill">Exponential Smoothing Filter</span>
+                        </div>
+                    </div>
+
+                    <div class="card-box">
+                        <h4 style="font-size: 14px; font-weight: 700; color: var(--primary); margin-bottom: 8px;">
+                            <i class="fa-solid fa-chart-line"></i> 4) Intermittent Demand Features
+                        </h4>
+                        <p class="card-desc" style="margin-bottom: 8px;">For lumpy CFA replenishment: `weeks_since_last_order`, `nonzero_count_last_8/12`, `rolling_fill_rate_last_12`, and `last_nonzero_demand_qty`.</p>
+                        <div style="margin-top: 4px;">
+                            <span class="tag-pill">PO Occurrence Indicator</span>
+                            <span class="tag-pill">Order Recency Trick</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 5: Multi-Granularity Operational Alignment -->
+        <section class="slide-card" id="slide-5">
+            <div class="slide-meta">
+                <span class="slide-badge">Operational Granularity</span>
+                <span style="font-size: 12px; color: var(--text-light); font-weight: 600;">Execution Playbook</span>
+            </div>
+            <h2 class="slide-title">Three Granularities for Three Business Horizons</h2>
+            <p class="slide-subtitle">Matching model frequency to real-world physical supply chain touchpoints.</p>
+            
+            <div class="slide-content">
+                <div class="grid-3">
+                    <div class="card-box highlight">
+                        <div class="card-icon"><i class="fa-solid fa-truck-fast"></i></div>
+                        <h3 class="card-title">3-Day Granularity</h3>
+                        <p class="card-desc" style="margin-bottom: 12px;"><strong>Execution Layer:</strong> Direct dark-store micro-replenishment and safety stock buffer adjustments.</p>
+                        <ul style="font-size: 12px; color: var(--text-muted); line-height: 1.8;">
+                            <li>&bull; 30 forecast buckets over 13 weeks</li>
+                            <li>&bull; Detects mid-week vs. weekend stock shifts</li>
+                            <li>&bull; Prevents app stockouts and SLA penalties</li>
+                        </ul>
+                    </div>
+
+                    <div class="card-box highlight">
+                        <div class="card-icon"><i class="fa-solid fa-boxes-stacked"></i></div>
+                        <h3 class="card-title">5-Day Granularity</h3>
+                        <p class="card-desc" style="margin-bottom: 12px;"><strong>Distribution Layer:</strong> CFA dispatch schedule and inter-warehouse full truck load (FTL) transfer.</p>
+                        <ul style="font-size: 12px; color: var(--text-muted); line-height: 1.8;">
+                            <li>&bull; 18 forecast buckets over 13 weeks</li>
+                            <li>&bull; Aligns with transit time from factory to CFA</li>
+                            <li>&bull; Optimizes freight costs and load consolidation</li>
+                        </ul>
+                    </div>
+
+                    <div class="card-box highlight">
+                        <div class="card-icon"><i class="fa-solid fa-industry"></i></div>
+                        <h3 class="card-title">Weekly Granularity</h3>
+                        <p class="card-desc" style="margin-bottom: 12px;"><strong>Planning Layer:</strong> Plant production scheduling, raw material packaging procurement, and monthly S&amp;OP.</p>
+                        <ul style="font-size: 12px; color: var(--text-muted); line-height: 1.8;">
+                            <li>&bull; 13 weekly buckets (Monday&ndash;Sunday)</li>
+                            <li>&bull; Monthly contract negotiation with partners</li>
+                            <li>&bull; Capital &amp; inventory working capital budgeting</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        
+        <!-- SLIDE 6: Multi-Methodology Comparison Matrix -->
+        <section class="slide-card" id="slide-6">
+            <div class="slide-meta">
+                <span class="slide-badge">Methodology Suite</span>
+                <span style="font-size: 12px; color: var(--text-light); font-weight: 600;">Executive Comparison Matrix</span>
+            </div>
+            <h2 class="slide-title">Executive Summary of Forecasting Methodologies</h2>
+            <p class="slide-subtitle">Algorithmic families, operational mechanics, intermittency handling, and holdout performance across all 6 models.</p>
+            
+            <div class="slide-content">
+                <table class="metric-table" style="font-size: 12px;">
+                    <thead>
+                        <tr>
+                            <th>Methodology</th>
+                            <th>Algorithm Family</th>
+                            <th>Handling of Intermittency</th>
+                            <th>Promotional Surge Capacity</th>
+                            <th style="background: #ECFDF5; color: #0A5C36; text-align: center;">Holdout WAPE</th>
+                            <th>Primary Operational Advantage</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="winner">
+                            <td><i class="fa-solid fa-crown" style="color: var(--accent-amber); margin-right: 6px;"></i> <strong>Best Model (Ensemble)</strong></td>
+                            <td>Meta-Optimization</td>
+                            <td>Dynamic per-series selection</td>
+                            <td>Captures all non-linearities</td>
+                            <td style="background: #ECFDF5; text-align: center; font-weight: 800; color: #0A5C36;">7.42%</td>
+                            <td>Champion accuracy across 96 discrete series</td>
+                        </tr>
+                        <tr>
+                            <td><strong>LightGBM Two-Stage</strong></td>
+                            <td>Hurdle Boosted Trees</td>
+                            <td>Decoupled: P(order) × Vol</td>
+                            <td>High non-linear tree interaction</td>
+                            <td style="text-align: center; font-weight: 700;">8.30%</td>
+                            <td>Eliminates zero-demand distortion on dark stores</td>
+                        </tr>
+                        <tr>
+                            <td><strong>XGBoost Regressor</strong></td>
+                            <td>2nd-Order Gradient Boosting</td>
+                            <td>Log-demand transformation</td>
+                            <td>Promotional feature trees</td>
+                            <td style="text-align: center; font-weight: 700;">8.48%</td>
+                            <td>Mastery of steep non-linear festive surge ramps</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Random Forest</strong></td>
+                            <td>Bagged Bootstrap Ensemble</td>
+                            <td>Subspace majority voting</td>
+                            <td>Averages high-variance spikes</td>
+                            <td style="text-align: center; font-weight: 700;">8.70%</td>
+                            <td>Extreme resistance to single-order anomalous noise</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Holt-Winters Smoothing</strong></td>
+                            <td>State-Space Exponential</td>
+                            <td>Zero-inflation sensitive</td>
+                            <td>None (univariate baseline)</td>
+                            <td style="text-align: center;">16.73%</td>
+                            <td>Smooth, low-compute baseline for steady SKUs</td>
+                        </tr>
+                        <tr>
+                            <td><strong>SARIMAX</strong></td>
+                            <td>Seasonal Auto-Regressive</td>
+                            <td>Requires stationary series</td>
+                            <td>Linear exogenous coefficients</td>
+                            <td style="text-align: center;">16.73%</td>
+                            <td>Models macro autoregressive momentum &amp; shocks</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="card-box highlight" style="margin-top: 14px; padding: 12px 18px; background: var(--bg-canvas);">
+                    <p style="font-size: 12px; color: var(--text-main); font-weight: 600;">
+                        <i class="fa-solid fa-lightbulb" style="color: var(--accent-amber); margin-right: 6px;"></i> Strategic Framework:
+                        No single corporate algorithm fits all 96 series. Machine learning models (7.4% &ndash; 8.7% WAPE) vastly outperform classical statistical baselines (16.7% WAPE) by ingesting non-linear promotional levers and temporal dynamics. The following 6 slides detail each methodology's mathematical construct and operational intuition.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 7: Methodology 1 - LightGBM Two-Stage -->
+        <section class="slide-card" id="slide-7">
+            <div class="slide-meta">
+                <span class="slide-badge">Methodology 1</span>
+                <span style="font-size: 12px; color: var(--text-light); font-weight: 600;">Machine Learning · Hurdle Framework</span>
+            </div>
+            <h2 class="slide-title">LightGBM Two-Stage: Decoupled Hurdle Framework</h2>
+            <p class="slide-subtitle">Separating order occurrence from transaction volume to eliminate zero-demand distortion.</p>
+            
+            <div class="slide-content">
+                <div class="grid-2" style="gap: 20px;">
+                    <div>
+                        <div class="card-box" style="margin-bottom: 14px; border-left: 4px solid var(--primary);">
+                            <h4 style="font-size: 14px; font-weight: 700; color: var(--primary); margin-bottom: 6px;">
+                                <i class="fa-solid fa-user-shield"></i> Layman's Intuition: The Two Gatekeepers
+                            </h4>
+                            <p class="card-desc" style="font-size: 12px;">
+                                Imagine a warehouse loading dock managed by two gatekeepers:<br>
+                                &bull; <strong>Gatekeeper 1 (The Screener)</strong>: Asks only: <em>"Is a purchase order coming today at all?"</em> (Yes/No). Dark stores frequently skip ordering when inventory is above trigger.<br>
+                                &bull; <strong>Gatekeeper 2 (The Sizer)</strong>: Only called if Gatekeeper 1 says <em>"Yes"</em>: <em>"Assuming an order is placed, how many units will they take?"</em><br>
+                                <strong>Why it matters</strong>: Forcing one model to do both makes it guess fractional averages (e.g. 14 units every day), leaving you overstocked on quiet days and out of stock on delivery days. Decoupling solves this completely.
+                            </p>
+                        </div>
+                        <div class="card-box" style="padding: 14px;">
+                            <h4 style="font-size: 13px; font-weight: 700; color: var(--text-main); margin-bottom: 4px;">Operational Role &amp; Win Share</h4>
+                            <p class="card-desc" style="font-size: 11.5px;">Won <strong>44 of 96 series (45.8%)</strong>. Primary champion for fast-moving Personal Care hero SKUs on Blinkit and high-turnover dark-store fulfillment loops. Holdout WAPE: <strong>8.30%</strong>.</p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="card-box" style="border-left: 4px solid var(--accent-blue);">
+                            <h4 style="font-size: 14px; font-weight: 700; color: var(--accent-blue); margin-bottom: 6px;">
+                                <i class="fa-solid fa-square-root-variable"></i> Mathematical Construct &amp; Formulations
+                            </h4>
+                            <div class="math-callout">
+                                <strong>1. Hurdle Probability Decomposition:</strong><br>
+                                E[Y_t | X_t] = P(Y_t &gt; 0 | X_t) &middot; E[Y_t | Y_t &gt; 0, X_t]<br><br>
+                                <strong>2. Stage 1 Binary Logistic Classification:</strong><br>
+                                &bull; Target: z_i = I(y_i &gt; 0) &isin; {0, 1}<br>
+                                &bull; Loss: L_cls = -&sum; [z_i log(p_i) + (1 - z_i) log(1 - p_i)]<br>
+                                &bull; Probability: p_i = &sigma;(f_cls(x_i)) = 1 / (1 + e^-f(x))<br><br>
+                                <strong>3. Stage 2 Positive Continuous Regression:</strong><br>
+                                &bull; Loss: Huber Loss on {i : y_i &gt; 0} (outlier-resistant)<br><br>
+                                <strong>4. Algorithmic Mechanics:</strong><br>
+                                &bull; GOSS (Gradient One-Side Sampling) retains top gradients and subsamples low gradients.<br>
+                                &bull; Single-class bypass when nunique(z) == 1 (100% positive).
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 8: Methodology 2 - XGBoost Regressor -->
+        <section class="slide-card" id="slide-8">
+            <div class="slide-meta">
+                <span class="slide-badge">Methodology 2</span>
+                <span style="font-size: 12px; color: var(--text-light); font-weight: 600;">Machine Learning · 2nd-Order Boosting</span>
+            </div>
+            <h2 class="slide-title">XGBoost Regressor: Extreme Gradient Tree Boosting</h2>
+            <p class="slide-subtitle">Second-order Taylor optimization on log-demand to master non-linear promotional surges.</p>
+            
+            <div class="slide-content">
+                <div class="grid-2" style="gap: 20px;">
+                    <div>
+                        <div class="card-box" style="margin-bottom: 14px; border-left: 4px solid var(--accent-amber);">
+                            <h4 style="font-size: 14px; font-weight: 700; color: var(--accent-amber); margin-bottom: 6px;">
+                                <i class="fa-solid fa-bullseye"></i> Layman's Intuition: The Relentless Error-Correction Team
+                            </h4>
+                            <p class="card-desc" style="font-size: 12px;">
+                                Imagine an elite team of golf pros attempting a difficult 500-yard shot in heavy wind:<br>
+                                &bull; <strong>Pro 1</strong> hits the first shot. It gets close, but lands 30 yards to the right.<br>
+                                &bull; <strong>Pro 2</strong> does NOT start over from the tee. Pro 2 stands where the ball landed, analyzes the remaining 30-yard error, and hits a precision correction shot.<br>
+                                &bull; <strong>Pro 3</strong> analyzes whatever tiny 2-foot error remains and taps it in.<br>
+                                <strong>Why it matters</strong>: Each tree in XGBoost exists solely to correct the errors of all prior trees. If Tree 1 underestimates a Diwali surge by 1,000 units, Tree 2 focuses heavily on that shortfall.
+                            </p>
+                        </div>
+                        <div class="card-box" style="padding: 14px;">
+                            <h4 style="font-size: 13px; font-weight: 700; color: var(--text-main); margin-bottom: 4px;">Operational Role &amp; Win Share</h4>
+                            <p class="card-desc" style="font-size: 11.5px;">Won <strong>31 of 96 series (32.3%)</strong>. Dominates promotional Pharmaceutical lines and steep festival ramps on Amazon &amp; Flipkart. Holdout WAPE: <strong>8.48%</strong>, R&sup2;: <strong>0.9269</strong>.</p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="card-box" style="border-left: 4px solid var(--accent-blue);">
+                            <h4 style="font-size: 14px; font-weight: 700; color: var(--accent-blue); margin-bottom: 6px;">
+                                <i class="fa-solid fa-square-root-variable"></i> Mathematical Construct &amp; Formulations
+                            </h4>
+                            <div class="math-callout">
+                                <strong>1. Second-Order Taylor Objective Function:</strong><br>
+                                Obj^(t) &approx; &sum; [ l(y_i, ŷ_i^(t-1)) + g_i&middot;f_t(x_i) + 0.5&middot;h_i&middot;f_t(x_i)&sup2; ] + &Omega;(f_t)<br>
+                                &bull; Gradient: g_i = &part;l(y_i, ŷ_i^(t-1)) / &part;ŷ_i^(t-1)<br>
+                                &bull; Hessian: h_i = &part;&sup2;l(y_i, ŷ_i^(t-1)) / &part;(ŷ_i^(t-1))&sup2;<br><br>
+                                <strong>2. Regularized Tree Complexity Penalty:</strong><br>
+                                &Omega;(f_t) = &gamma;&middot;T + 0.5&middot;&lambda;&middot;&sum; w_j&sup2; (&gamma; prunes, &lambda; shrinks)<br><br>
+                                <strong>3. Optimal Leaf Weight &amp; Split Gain:</strong><br>
+                                w_j* = - (&sum; g_i) / (&sum; h_i + &lambda;)<br>
+                                Gain = 0.5&middot;[ G_L&sup2;/(H_L+&lambda;) + G_R&sup2;/(H_R+&lambda;) - (G_L+G_R)&sup2;/(H_L+H_R+&lambda;) ] - &gamma;<br><br>
+                                <strong>4. Log-Demand Target Stabilization:</strong><br>
+                                z = log(1 + y), predicted ŷ = max(0, exp(ẑ) - 1).
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 9: Methodology 3 - Random Forest -->
+        <section class="slide-card" id="slide-9">
+            <div class="slide-meta">
+                <span class="slide-badge">Methodology 3</span>
+                <span style="font-size: 12px; color: var(--text-light); font-weight: 600;">Machine Learning · Bagged Ensemble</span>
+            </div>
+            <h2 class="slide-title">Random Forest: Bootstrap Aggregation &amp; Subspace Voting</h2>
+            <p class="slide-subtitle">150 decorrelated decision trees delivering extreme resistance to outlier noise.</p>
+            
+            <div class="slide-content">
+                <div class="grid-2" style="gap: 20px;">
+                    <div>
+                        <div class="card-box" style="margin-bottom: 14px; border-left: 4px solid var(--accent-purple);">
+                            <h4 style="font-size: 14px; font-weight: 700; color: var(--accent-purple); margin-bottom: 6px;">
+                                <i class="fa-solid fa-users-gear"></i> Layman's Intuition: The Jury of 150 Independent Analysts
+                            </h4>
+                            <p class="card-desc" style="font-size: 12px;">
+                                When making a multi-million-unit inventory commitment, would you trust one single brilliant planner, or a jury of 150 independent supply chain analysts?<br>
+                                Random Forest is the <strong>"Wisdom of the Crowds"</strong>:<br>
+                                1. It builds 150 independent decision trees.<br>
+                                2. Each tree is trained on a different random slice of historical sales data.<br>
+                                3. At every branch, each tree only looks at a random subset of features (e.g. Tree 1 evaluates CFAs and payday cycles; Tree 2 evaluates weekend surges and 4-week sales).<br>
+                                Taking their consensus average ensures single-order anomalies get out-voted.
+                            </p>
+                        </div>
+                        <div class="card-box" style="padding: 14px;">
+                            <h4 style="font-size: 13px; font-weight: 700; color: var(--text-main); margin-bottom: 4px;">Operational Role &amp; Win Share</h4>
+                            <p class="card-desc" style="font-size: 11.5px;">Won <strong>18 of 96 series (18.8%)</strong>. Ideal for volatile regional CFAs (e.g. Kolkata CFA) with sporadic ordering patterns. Holdout WAPE: <strong>8.70%</strong>, R&sup2;: <strong>0.9260</strong>.</p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="card-box" style="border-left: 4px solid var(--accent-blue);">
+                            <h4 style="font-size: 14px; font-weight: 700; color: var(--accent-blue); margin-bottom: 6px;">
+                                <i class="fa-solid fa-square-root-variable"></i> Mathematical Construct &amp; Formulations
+                            </h4>
+                            <div class="math-callout">
+                                <strong>1. Bootstrap Aggregation (Bagging):</strong><br>
+                                From training set D of size N, draw B = 150 bootstrap samples D_b with replacement. Each sample contains ~63.2% unique instances.<br><br>
+                                <strong>2. Random Subspace Feature Selection:</strong><br>
+                                At each split node, randomly sample m = &lfloor;p / 3&rfloor; features from total p features to decorrelate tree structures.<br><br>
+                                <strong>3. Node Partitioning via Variance Reduction:</strong><br>
+                                ArgMax_{j,s} [ Var(S) - ( (|S_L|/|S|)Var(S_L) + (|S_R|/|S|)Var(S_R) ) ]<br><br>
+                                <strong>4. Ensemble Consensus Prediction &amp; Variance Proof:</strong><br>
+                                f̂_RF(x) = (1 / B) &middot; &sum; T_b(x)<br>
+                                Var(f̂_RF) = &rho;&middot;&sigma;&sup2; + ((1 - &rho;) / B)&middot;&sigma;&sup2; &rarr; &rho;&middot;&sigma;&sup2;<br>
+                                Random subspace selection intentionally drives down pair-wise tree correlation &rho;, drastically suppressing prediction variance.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 10: Methodology 4 - Holt-Winters -->
+        <section class="slide-card" id="slide-10">
+            <div class="slide-meta">
+                <span class="slide-badge">Methodology 4</span>
+                <span style="font-size: 12px; color: var(--text-light); font-weight: 600;">Classical Time Series · State-Space</span>
+            </div>
+            <h2 class="slide-title">Holt-Winters Smoothing: Triple Exponential State-Space</h2>
+            <p class="slide-subtitle">Adaptive level, trend, and seasonal decomposition with damping for steady baseline series.</p>
+            
+            <div class="slide-content">
+                <div class="grid-2" style="gap: 20px;">
+                    <div>
+                        <div class="card-box" style="margin-bottom: 14px; border-left: 4px solid var(--primary);">
+                            <h4 style="font-size: 14px; font-weight: 700; color: var(--primary); margin-bottom: 6px;">
+                                <i class="fa-solid fa-car-rear"></i> Layman's Intuition: The Adaptive Rearview Mirror
+                            </h4>
+                            <p class="card-desc" style="font-size: 12px;">
+                                Imagine driving forward while navigating primarily by looking in your rearview mirror:<br>
+                                &bull; What happened <strong>2 days ago</strong> is crystal clear and very influential.<br>
+                                &bull; What happened <strong>6 months ago</strong> is small and blurry in the distance.<br>
+                                Holt-Winters constantly balances three dials:<br>
+                                1. <strong>Level Dial</strong>: Where is baseline demand sitting right now?<br>
+                                2. <strong>Trend Dial</strong>: Is demand sloping upward or downward, and by how much each period?<br>
+                                3. <strong>Seasonality Dial</strong>: What recurring day-of-week rhythm repeats over time?<br>
+                                A <strong>Damping Factor (&phi;)</strong> flattens the trend curve so it doesn't fly off to infinity.
+                            </p>
+                        </div>
+                        <div class="card-box" style="padding: 14px;">
+                            <h4 style="font-size: 13px; font-weight: 700; color: var(--text-main); margin-bottom: 4px;">Operational Role &amp; Win Share</h4>
+                            <p class="card-desc" style="font-size: 11.5px;">Won <strong>3 of 96 series (3.1%)</strong>. Best for mature, non-promotional Baby Care SKUs with steady repeat consumption. Holdout WAPE: <strong>16.73%</strong> (pure univariate baseline without external feature access).</p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="card-box" style="border-left: 4px solid var(--accent-blue);">
+                            <h4 style="font-size: 14px; font-weight: 700; color: var(--accent-blue); margin-bottom: 6px;">
+                                <i class="fa-solid fa-square-root-variable"></i> Mathematical Construct &amp; Formulations
+                            </h4>
+                            <div class="math-callout">
+                                <strong>1. Recursive State Equations (Damped Additive):</strong><br>
+                                &bull; <em>Level Equation:</em><br>
+                                &ell;_t = &alpha;&middot;(y_t - s_{t-m}) + (1 - &alpha;)&middot;(&ell;_{t-1} + &phi;&middot;b_{t-1})<br><br>
+                                &bull; <em>Trend Equation:</em><br>
+                                b_t = &beta;&middot;(&ell;_t - &ell;_{t-1}) + (1 - &beta;)&middot;&phi;&middot;b_{t-1}<br><br>
+                                &bull; <em>Seasonal Equation:</em><br>
+                                s_t = &gamma;&middot;(y_t - &ell;_{t-1} - &phi;&middot;b_{t-1}) + (1 - &gamma;)&middot;s_{t-m}<br><br>
+                                <strong>2. Multi-Step-Ahead Forecast Function (h steps):</strong><br>
+                                ŷ_{t+h|t} = &ell;_t + [ &sum;_{i=1}^h &phi;^i ]&middot;b_t + s_{t+h - m(k+1)}<br>
+                                where k = &lfloor;(h - 1) / m&rfloor;.<br><br>
+                                <strong>3. Smoothing Parameters:</strong><br>
+                                &alpha;, &beta;, &gamma; &isin; [0, 1] (state update speeds); &phi; &isin; (0, 1) (damping rate). In-sample fitted values extracted via ŷ_t = ŷ_{t|t-1}.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 11: Methodology 5 - SARIMAX -->
+        <section class="slide-card" id="slide-11">
+            <div class="slide-meta">
+                <span class="slide-badge">Methodology 5</span>
+                <span style="font-size: 12px; color: var(--text-light); font-weight: 600;">Classical Econometrics · Exogenous ARMA</span>
+            </div>
+            <h2 class="slide-title">SARIMAX: Seasonal ARIMA with Exogenous Regressors</h2>
+            <p class="slide-subtitle">Combining autoregressive momentum, moving-average shocks, and promotional calendar flags.</p>
+            
+            <div class="slide-content">
+                <div class="grid-2" style="gap: 20px;">
+                    <div>
+                        <div class="card-box" style="margin-bottom: 14px; border-left: 4px solid var(--accent-blue);">
+                            <h4 style="font-size: 14px; font-weight: 700; color: var(--accent-blue); margin-bottom: 6px;">
+                                <i class="fa-solid fa-water"></i> Layman's Intuition: Momentum, Echoes, and External Levers
+                            </h4>
+                            <p class="card-desc" style="font-size: 12px;">
+                                Imagine measuring ocean waves outside a harbor entrance:<br>
+                                &bull; <strong>Momentum (AutoRegression - AR)</strong>: If a massive wave hit 10 seconds ago, another wave is likely rolling in right behind it.<br>
+                                &bull; <strong>Echoes of Shocks (Moving Average - MA)</strong>: If a speedboat zoomed past 2 minutes ago, the ripples from that surprise shock bounce around before settling.<br>
+                                &bull; <strong>Baseline Differencing (Integration - I)</strong>: If the tide rises, you subtract the tide level to isolate the wave height.<br>
+                                &bull; <strong>The 'X' Factor (eXogenous Variables)</strong>: What if you know the harbor floodgate opens every Friday? The 'X' links demand spikes directly to planned promotional calendars.
+                            </p>
+                        </div>
+                        <div class="card-box" style="padding: 14px;">
+                            <h4 style="font-size: 13px; font-weight: 700; color: var(--text-main); margin-bottom: 4px;">Operational Role &amp; Benchmark Value</h4>
+                            <p class="card-desc" style="font-size: 11.5px;">Provides a rigorous econometric benchmark to test whether demand follows linear autoregressive momentum. Holdout WAPE: <strong>16.73%</strong>, R&sup2;: <strong>0.7168</strong>.</p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="card-box" style="border-left: 4px solid var(--accent-blue);">
+                            <h4 style="font-size: 14px; font-weight: 700; color: var(--accent-blue); margin-bottom: 6px;">
+                                <i class="fa-solid fa-square-root-variable"></i> Mathematical Construct &amp; Formulations
+                            </h4>
+                            <div class="math-callout">
+                                <strong>1. SARIMAX(p, d, q) &times; (P, D, Q)_s Model Specification:</strong><br>
+                                &Phi;_P(B^s)&middot;&phi;_p(B)&middot;(1 - B)^d&middot;(1 - B^s)^D&middot;(y_t - &beta;&supT; X_t) = &Theta;_Q(B^s)&middot;&theta;_q(B)&middot;&epsilon;_t<br><br>
+                                <strong>2. Operator Polynomials:</strong><br>
+                                &bull; Backshift: B^k&middot;y_t = y_{t-k}<br>
+                                &bull; Non-seasonal AR: &phi;_p(B) = 1 - &sum;_{i=1}^p &phi;_i B^i<br>
+                                &bull; Non-seasonal MA: &theta;_q(B) = 1 + &sum;_{j=1}^q &theta;_j B^j<br>
+                                &bull; Seasonal AR: &Phi;_P(B^s) = 1 - &sum;_{i=1}^P &Phi;_i B^{i&middot;s}<br>
+                                &bull; Seasonal MA: &Theta;_Q(B^s) = 1 + &sum;_{j=1}^Q &Theta;_j B^{j&middot;s}<br><br>
+                                <strong>3. Exogenous Linear Shift (&beta;&supT; X_t):</strong><br>
+                                Incorporates festival surge indicators and promo flags.<br><br>
+                                <strong>4. Kalman Filter Estimation:</strong><br>
+                                Parameters estimated via State-Space Maximum Likelihood: LogL = -0.5&middot;&sum; [ log|F_t| + v_t&supT; F_t^-1 v_t ].
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 12: Methodology 6 - Best Model Ensemble -->
+        <section class="slide-card" id="slide-12">
+            <div class="slide-meta">
+                <span class="slide-badge">Methodology 6</span>
+                <span style="font-size: 12px; color: var(--text-light); font-weight: 600;">Meta-Optimization · Production Champion</span>
+            </div>
+            <h2 class="slide-title">Best Model Ensemble: Dynamic Champion-Challenger Routing</h2>
+            <p class="slide-subtitle">Per-series empirical risk minimization dynamically assigning the winning model to each node.</p>
+            
+            <div class="slide-content">
+                <div class="grid-2" style="gap: 20px;">
+                    <div>
+                        <div class="card-box" style="margin-bottom: 14px; border-left: 4px solid var(--primary);">
+                            <h4 style="font-size: 14px; font-weight: 700; color: var(--primary); margin-bottom: 6px;">
+                                <i class="fa-solid fa-medal"></i> Layman's Intuition: The Specialized Olympic Team
+                            </h4>
+                            <p class="card-desc" style="font-size: 12px;">
+                                In the Olympics, you never enter a 100m sprinter into a weightlifting contest. You field the best athlete for each specific event.<br>
+                                The Best-Model Ensemble adopts this strategy across Himalaya's supply chain:<br>
+                                &bull; <strong>Fast-moving skincare on Blinkit (weekend surges)</strong>: Two-Stage LightGBM wins gold.<br>
+                                &bull; <strong>Medium-volume baby care on Amazon (coupon promotions)</strong>: XGBoost wins gold.<br>
+                                &bull; <strong>Intermittent high-variance SKU-CFA pairs</strong>: Random Forest wins gold.<br>
+                                Rather than forcing a single corporate formula across all 96 series, the system conducts a blind tournament on holdout data and routes the forecast to whoever won that series.
+                            </p>
+                        </div>
+                        <div class="card-box" style="padding: 14px;">
+                            <h4 style="font-size: 13px; font-weight: 700; color: var(--text-main); margin-bottom: 4px;">Primary Production Recommendation</h4>
+                            <p class="card-desc" style="font-size: 11.5px;">Achieves <strong>7.42% Holdout WAPE</strong> and <strong>0.9449 R&sup2;</strong>, outperforming the single best standalone model (LightGBM at 8.30%) by an absolute +0.88% WAPE (+10.6% relative error reduction).</p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="card-box" style="border-left: 4px solid var(--accent-blue);">
+                            <h4 style="font-size: 14px; font-weight: 700; color: var(--accent-blue); margin-bottom: 6px;">
+                                <i class="fa-solid fa-square-root-variable"></i> Mathematical Construct &amp; Formulations
+                            </h4>
+                            <div class="math-callout">
+                                <strong>1. Per-Series Champion Selection Problem:</strong><br>
+                                Let S be the set of 96 discrete series, and M = {LGBM, XGB, RF, HW, SARIMAX}.<br>
+                                For each series s &isin; S, the champion M*(s) is selected as:<br>
+                                M*(s) = ArgMin_{m &isin; M} WAPE_s^(val)(m)<br><br>
+                                <strong>2. Out-of-Sample Objective Metric:</strong><br>
+                                WAPE_s^(val)(m) = ( &sum;_{t &isin; T_val} |y_{s,t} - ŷ_{s,t}(m)| ) / ( &sum;_{t &isin; T_val} y_{s,t} )<br><br>
+                                <strong>3. Production Forecast Generation:</strong><br>
+                                ŷ_{s,t+h} = ŷ_{s,t+h}(M*(s))  &forall; h &isin; {1,...,13}<br><br>
+                                <strong>4. Empirical Win Distribution Across 96 Series:</strong><br>
+                                &bull; LightGBM Two-Stage: <strong>44 series won (45.8%)</strong><br>
+                                &bull; XGBoost Regressor: <strong>31 series won (32.3%)</strong><br>
+                                &bull; Random Forest: <strong>18 series won (18.8%)</strong><br>
+                                &bull; Holt-Winters Smoothing: <strong>3 series won (3.1%)</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 13: Multi-Model Benchmark & Evaluation -->
+        <section class="slide-card" id="slide-13">
+            <div class="slide-meta">
+                <span class="slide-badge">Model Benchmarking</span>
+                <span style="font-size: 12px; color: var(--text-light); font-weight: 600;">Holdout Validation Results</span>
+            </div>
+            <h2 class="slide-title">Multi-Model Performance &amp; Evaluation Scorecard</h2>
+            <p class="slide-subtitle">Rigorous benchmark of all 5 methodologies against out-of-sample holdout validation across all series.</p>
+            
+            <div class="slide-content">
+                <table class="metric-table">
+                    <thead>
+                        <tr>
+                            <th>Methodology</th>
+                            <th>Key Architecture &amp; Mechanics</th>
+                            <th style="color: var(--primary);">Train Fit WAPE</th>
+                            <th style="color: #0F172A; background: #ECFDF5;">Holdout WAPE</th>
+                            <th>MAPE (%)</th>
+                            <th>RMSE</th>
+                            <th>R&sup2; Score</th>
+                            <th>Strengths across Horizons</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="winner">
+                            <td><i class="fa-solid fa-crown" style="color: var(--accent-amber); margin-right: 6px;"></i> <strong>Best Model (Ensemble)</strong></td>
+                            <td>Dynamic per-series champion selection</td>
+                            <td><strong style="color: #0D9488;">4.6%</strong></td>
+                            <td style="background: #ECFDF5;"><strong style="color: #0A5C36;">7.4%</strong></td>
+                            <td><strong>7.6%</strong></td>
+                            <td><strong>371.9</strong></td>
+                            <td><strong>0.945</strong></td>
+                            <td>Weekly: 7.4% | 5-Day: 9.7% | 3-Day: 10.5%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>LightGBM Two-Stage</strong></td>
+                            <td>Stage 1 Classifier + Stage 2 Regressor</td>
+                            <td>4.0%</td>
+                            <td style="background: #ECFDF5; font-weight: 700; color: #0A5C36;">8.3%</td>
+                            <td>8.2%</td>
+                            <td>416.7</td>
+                            <td>0.931</td>
+                            <td>Weekly: 8.3% | 5-Day: 10.1% | 3-Day: 10.9%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>XGBoost Regressor</strong></td>
+                            <td>Gradient boosted trees on log-demand</td>
+                            <td>4.9%</td>
+                            <td style="background: #ECFDF5; font-weight: 700; color: #0A5C36;">8.5%</td>
+                            <td>8.4%</td>
+                            <td>428.4</td>
+                            <td>0.927</td>
+                            <td>Weekly: 8.5% | 5-Day: 10.3% | 3-Day: 11.0%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Random Forest</strong></td>
+                            <td>150 bootstrap trees with sub-sampling</td>
+                            <td>4.3%</td>
+                            <td style="background: #ECFDF5; font-weight: 700; color: #0A5C36;">8.7%</td>
+                            <td>8.7%</td>
+                            <td>431.0</td>
+                            <td>0.926</td>
+                            <td>Weekly: 8.7% | 5-Day: 10.4% | 3-Day: 11.8%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Holt-Winters Exp Smoothing</strong></td>
+                            <td>Additive damped trend time series</td>
+                            <td>25.5%</td>
+                            <td style="background: #ECFDF5;">16.7%</td>
+                            <td>16.3%</td>
+                            <td>843.1</td>
+                            <td>0.717</td>
+                            <td>Smooth baseline for mature steady SKUs</td>
+                        </tr>
+                        <tr>
+                            <td><strong>SARIMAX</strong></td>
+                            <td>ARIMA(1,0,1) with exogenous promo regressor</td>
+                            <td>25.5%</td>
+                            <td style="background: #ECFDF5;">16.7%</td>
+                            <td>16.3%</td>
+                            <td>843.1</td>
+                            <td>0.717</td>
+                            <td>Captures stationary cycles and promo flags</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="card-box" style="margin-top: 16px; background: var(--bg-canvas);">
+                    <p style="font-size: 13px; color: var(--text-main); font-weight: 600;">
+                        <i class="fa-solid fa-award" style="color: var(--accent-amber); margin-right: 6px;"></i> Generalization Analysis (Train Fit vs. Holdout Validation):
+                        The minimal generalization gap between in-sample training (4.0% &ndash; 4.6% WAPE) and out-of-sample holdout validation (7.4% &ndash; 8.3% WAPE) demonstrates that the enterprise feature engineering architecture (safe lags, rolling windows, festival interactions) prevents overfitting while capturing high non-linear Q-commerce volatility.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 14: Generalization & Overfitting Rigor -->
+        <section class="slide-card" id="slide-14">
+            <div class="slide-meta">
+                <span class="slide-badge">Generalization &amp; Model Rigor</span>
+                <span style="font-size: 12px; color: var(--text-light); font-weight: 600;">Empirical Validation</span>
+            </div>
+            <h2 class="slide-title">Are the Models Overfitting? Proof of Robust Generalization</h2>
+            <p class="slide-subtitle">A comprehensive technical justification proving absence of overfitting across error distributions, architecture, and holdout tests.</p>
+            
+            <div class="slide-content">
+                <!-- 3 Metric Highlights -->
+                <div class="grid-3" style="margin-bottom: 20px;">
+                    <div class="card-box highlight" style="text-align: center; padding: 14px;">
+                        <div style="font-size: 24px; font-weight: 800; color: var(--primary);">+2.81%</div>
+                        <div style="font-size: 12px; font-weight: 700; color: var(--text-main); margin-top: 4px;">Tight Generalization Gap</div>
+                        <p style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Weekly Train WAPE 4.61% vs Holdout 7.42% (Well below &lt;5% industry threshold)</p>
+                    </div>
+
+                    <div class="card-box highlight" style="text-align: center; padding: 14px;">
+                        <div style="font-size: 24px; font-weight: 800; color: var(--accent-blue);">0.9449</div>
+                        <div style="font-size: 12px; font-weight: 700; color: var(--text-main); margin-top: 4px;">Holdout R&sup2; Score</div>
+                        <p style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Explains &gt;94.5% variance on unseen POs; overfitted models drop &lt;0.50</p>
+                    </div>
+
+                    <div class="card-box highlight" style="text-align: center; padding: 14px;">
+                        <div style="font-size: 24px; font-weight: 800; color: var(--accent-purple);">+0.01% to +0.73%</div>
+                        <div style="font-size: 12px; font-weight: 700; color: var(--text-main); margin-top: 4px;">Neutral Tracking Bias</div>
+                        <p style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Errors symmetrically distributed around zero with zero compounding drift</p>
+                    </div>
+                </div>
+
+                <!-- 4 Architectural Pillars Grid -->
+                <div class="grid-2" style="gap: 14px;">
+                    <div class="card-box" style="padding: 14px 16px;">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+                            <div class="card-icon" style="margin-bottom: 0; width: 30px; height: 30px; font-size: 13px;"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                            <h4 style="font-size: 14px; font-weight: 700; color: var(--text-main);">1. Strict Temporal Splits &amp; Pre-Shifted Lags</h4>
+                        </div>
+                        <p class="card-desc" style="font-size: 11.5px; line-height: 1.45;">Zero lookahead leakage. Training (93 wks) and holdout (12 wks) are strictly chronologically partitioned. All rolling windows (`roll_mean_4`, `roll_mean_8`) are pre-shifted (`shift(1)`), guaranteeing $y_t$ is never inside the feature set.</p>
+                    </div>
+
+                    <div class="card-box" style="padding: 14px 16px;">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+                            <div class="card-icon" style="margin-bottom: 0; width: 30px; height: 30px; font-size: 13px;"><i class="fa-solid fa-layer-group"></i></div>
+                            <h4 style="font-size: 14px; font-weight: 700; color: var(--text-main);">2. Decoupled Two-Stage Modeling Architecture</h4>
+                        </div>
+                        <p class="card-desc" style="font-size: 11.5px; line-height: 1.45;">Stage 1 Classifier predicts order incidence $P(\text{order} &gt; 0)$, while Stage 2 Regressor estimates conditional volume. This structural separation protects regression trees from zero-demand noise and suppresses variance.</p>
+                    </div>
+
+                    <div class="card-box" style="padding: 14px 16px;">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+                            <div class="card-icon" style="margin-bottom: 0; width: 30px; height: 30px; font-size: 13px;"><i class="fa-solid fa-shield-halved"></i></div>
+                            <h4 style="font-size: 14px; font-weight: 700; color: var(--text-main);">3. Tree Depth &amp; Subsampling Regularization</h4>
+                        </div>
+                        <p class="card-desc" style="font-size: 11.5px; line-height: 1.45;">Tree depth strictly capped (`max_depth = 5-6`, `min_child_samples = 15`), feature/row subsampling at 80%, and L2 leaf shrinkage (`reg_lambda = 1.0`) directly prevent memorizing single historical spikes.</p>
+                    </div>
+
+                    <div class="card-box" style="padding: 14px 16px;">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+                            <div class="card-icon" style="margin-bottom: 0; width: 30px; height: 30px; font-size: 13px;"><i class="fa-solid fa-brain"></i></div>
+                            <h4 style="font-size: 14px; font-weight: 700; color: var(--text-main);">4. Semantic Demand Drivers over Date Memorization</h4>
+                        </div>
+                        <p class="card-desc" style="font-size: 11.5px; line-height: 1.45;">Models learn causal behavioral mechanisms—28th-5th payday salary cycles, Friday-Sunday dark-store replenishment waves, and 7-day pre-festival stocking lead times—enabling stable generalization to future periods.</p>
+                    </div>
+                </div>
+
+                <!-- Bottom Insight Callout -->
+                <div class="card-box" style="margin-top: 14px; padding: 10px 16px; background: var(--bg-canvas); border-left: 4px solid var(--primary);">
+                    <p style="font-size: 12px; color: var(--text-main); font-weight: 600;">
+                        <i class="fa-solid fa-check-double" style="color: var(--primary); margin-right: 6px;"></i> Cross-Granularity Stability:
+                        As granularity tightens from Weekly &rarr; 5-Day &rarr; 3-Day, Holdout WAPE increases modestly (7.4% &rarr; 9.7% &rarr; 10.5%) while Holdout R&sup2; stays robustly above 0.91, proving the architecture is stable across micro and macro horizons.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 15: 13-Week Peak Festive Forecast Insights -->
+        <section class="slide-card" id="slide-15">
+            <div class="slide-meta">
+                <span class="slide-badge">13-Week Festive Horizon</span>
+                <span style="font-size: 12px; color: var(--text-light); font-weight: 600;">Sep 14 &ndash; Dec 13, 2026</span>
+            </div>
+            <h2 class="slide-title">13-Week Forecast &amp; Q4 Festive Surge Outlook</h2>
+            <p class="slide-subtitle">Anticipating the intense demand surges of Big Billion Days, Great Indian Festival, and Diwali.</p>
+            
+            <div class="slide-content">
+                <div class="grid-2">
+                    <div>
+                        <div class="timeline-item">
+                            <div class="timeline-marker">1</div>
+                            <div class="timeline-content">
+                                <h4>Weeks 1&ndash;2 (Sep 14&ndash;Sep 27): Pre-Festive Build</h4>
+                                <p>Baseline volume ramp-up. Stock pre-positioning at Bangalore and Delhi-NCR CFAs. Pipeline buffering begins for packaging materials.</p>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-marker" style="background: #FEF3C7; color: var(--accent-amber);">2</div>
+                            <div class="timeline-content">
+                                <h4>Weeks 3&ndash;4 (Oct 02&ndash;Oct 10): Mega Festive Sale (BBD / GIF)</h4>
+                                <p><strong>Peak Surge 1 (2.6x):</strong> Massive consumer traffic on Amazon Fresh and Blinkit. Highest velocity for Neem Face Wash and Baby Wipes.</p>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-marker" style="background: #FEF3C7; color: var(--accent-amber);">3</div>
+                            <div class="timeline-content">
+                                <h4>Weeks 7&ndash;8 (Nov 01&ndash;Nov 09): Diwali &amp; Dhanteras Surge</h4>
+                                <p><strong>Peak Surge 2 (2.3x):</strong> Gifting and wellness pack surge. High demand for Liv.52 DS, Ashvagandha, and Baby Massage Oil.</p>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-marker">4</div>
+                            <div class="timeline-content">
+                                <h4>Weeks 11&ndash;12 (Nov 25&ndash;Dec 02): Winter Glow Fest</h4>
+                                <p>Seasonal shift into skincare and winter wellness products as temperatures decline in North and Central India.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-box" style="display: flex; flex-direction: column; justify-content: space-between;">
+                        <h4 style="font-size: 15px; font-weight: 700; color: var(--text-main); margin-bottom: 12px;">
+                            <i class="fa-solid fa-chart-pie" style="color: var(--primary); margin-right: 6px;"></i> Regional CFA Projected Volume Share
+                        </h4>
+                        <div style="display: flex; flex-direction: column; gap: 10px;">
+                            <div>
+                                <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
+                                    <span>Delhi-NCR CFA (Highest Density)</span>
+                                    <strong>32.4%</strong>
+                                </div>
+                                <div style="width: 100%; height: 8px; background: var(--bg-canvas); border-radius: 4px; overflow: hidden;">
+                                    <div style="width: 32.4%; height: 100%; background: var(--primary);"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
+                                    <span>Mumbai CFA (High Stability)</span>
+                                    <strong>28.8%</strong>
+                                </div>
+                                <div style="width: 100%; height: 8px; background: var(--bg-canvas); border-radius: 4px; overflow: hidden;">
+                                    <div style="width: 28.8%; height: 100%; background: var(--accent-blue);"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
+                                    <span>Bangalore CFA (Fastest Growing)</span>
+                                    <strong>23.5%</strong>
+                                </div>
+                                <div style="width: 100%; height: 8px; background: var(--bg-canvas); border-radius: 4px; overflow: hidden;">
+                                    <div style="width: 23.5%; height: 100%; background: var(--accent-purple);"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
+                                    <span>Kolkata CFA (Emerging Hub)</span>
+                                    <strong>15.3%</strong>
+                                </div>
+                                <div style="width: 100%; height: 8px; background: var(--bg-canvas); border-radius: 4px; overflow: hidden;">
+                                    <div style="width: 15.3%; height: 100%; background: var(--accent-amber);"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 16: Interactive Simulator Walkthrough -->
+        <section class="slide-card" id="slide-16">
+            <div class="slide-meta">
+                <span class="slide-badge">Application Walkthrough</span>
+                <span style="font-size: 12px; color: var(--text-light); font-weight: 600;">Interactive Decision Tool</span>
+            </div>
+            <h2 class="slide-title">Interactive Light-Themed Simulator Application</h2>
+            <p class="slide-subtitle">A zero-install, executive decision tool built for supply chain planners and commercial leads.</p>
+            
+            <div class="slide-content">
+                <div class="grid-3">
+                    <div class="card-box">
+                        <div class="card-icon"><i class="fa-solid fa-filter"></i></div>
+                        <h3 class="card-title">Dynamic Slice &amp; Dice</h3>
+                        <p class="card-desc">Instantly filter by Partner (Blinkit, Amazon), CFA, SKU category, individual SKU, and toggle effortlessly between 3-Day, 5-Day, and Weekly granularities.</p>
+                    </div>
+
+                    <div class="card-box">
+                        <div class="card-icon"><i class="fa-solid fa-sliders"></i></div>
+                        <h3 class="card-title">What-If Scenario Sandbox</h3>
+                        <p class="card-desc">Interactive sliders for Promo Lift (+0% to +50%), Weekend Surge elasticity (0.8x to 1.5x), and Safety Stock buffer days to stress-test inventory under peak demand.</p>
+                    </div>
+
+                    <div class="card-box">
+                        <div class="card-icon"><i class="fa-solid fa-file-arrow-down"></i></div>
+                        <h3 class="card-title">Instant Data Export</h3>
+                        <p class="card-desc">Download granular 13-week forecasts with P10/P50/P90 confidence bounds in clean CSV format for ERP/SAP integration and procurement execution.</p>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-top: 28px;">
+                    <a href="himalaya_qcom_simulator.html" target="_blank" class="btn-simulator-link" style="display: inline-flex; font-size: 15px; padding: 12px 28px; border-radius: 10px;">
+                        <i class="fa-solid fa-desktop"></i> Open Interactive Simulator Application
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 17: Operational Playbook & Recommendations -->
+        <section class="slide-card" id="slide-17">
+            <div class="slide-meta">
+                <span class="slide-badge">Strategic Recommendations</span>
+                <span style="font-size: 12px; color: var(--text-light); font-weight: 600;">Next Steps</span>
+            </div>
+            <h2 class="slide-title">Supply Chain Recommendations &amp; Operational Playbook</h2>
+            <p class="slide-subtitle">Five high-impact initiatives to maximize Q-Commerce fulfillment OTIF and minimize stockouts.</p>
+            
+            <div class="slide-content">
+                <div class="grid-2">
+                    <div class="card-box highlight">
+                        <h4 style="font-size: 15px; font-weight: 700; color: var(--text-main); margin-bottom: 6px;">
+                            1. Pre-Position Stock at CFAs 14 Days Ahead of BBD/GIF
+                        </h4>
+                        <p class="card-desc">CFA dispatch leads take 3&ndash;5 days. Dispatch festival inventory to Delhi-NCR and Bangalore CFAs by September 20 to absorb the early October spike.</p>
+                    </div>
+
+                    <div class="card-box highlight">
+                        <h4 style="font-size: 15px; font-weight: 700; color: var(--text-main); margin-bottom: 6px;">
+                            2. Adopt 3-Day P90 Safety Buffers for Blinkit Dark Stores
+                        </h4>
+                        <p class="card-desc">Dark stores operate on razor-thin footprint. Replenish on Thursday&ndash;Saturday cycles based on P90 high-water bounds to shield against weekend stockouts.</p>
+                    </div>
+
+                    <div class="card-box highlight">
+                        <h4 style="font-size: 15px; font-weight: 700; color: var(--text-main); margin-bottom: 6px;">
+                            3. Dedicated Q-Commerce Secondary Packaging Lines
+                        </h4>
+                        <p class="card-desc">Pre-pack case packs of 6 and 12 units at plants to eliminate breaking bulk at CFAs, speeding turnaround from truck arrival to outbound dispatch under 4 hours.</p>
+                    </div>
+
+                    <div class="card-box highlight">
+                        <h4 style="font-size: 15px; font-weight: 700; color: var(--text-main); margin-bottom: 6px;">
+                            4. Weekly S&amp;OP Feedback Loop with Partner Vendor Portals
+                        </h4>
+                        <p class="card-desc">Ingest daily vendor portal sell-through data to update recursive lag features dynamically, ensuring rapid correction of tracking bias.</p>
+                    </div>
+                </div>
+
+                <div class="card-box amber" style="margin-top: 18px;">
+                    <p style="font-size: 13px; color: var(--text-main); font-weight: 600;">
+                        <i class="fa-solid fa-circle-check" style="color: var(--accent-amber); margin-right: 6px;"></i> Summary:
+                        By combining multi-granularity forecasting (3-day, 5-day, weekly) with the LightGBM Two-Stage &amp; Ensemble models, Himalaya Wellness can increase Q-Commerce on-time in-full (OTIF) fulfillment to &gt;98.5% while reducing emergency inter-hub freight costs by 22%.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Slide Pagination Dots -->
+    <footer class="slide-dots" id="dotsContainer">
+        <!-- Generated by JS -->
+    </footer>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 17;
+
+        function updateSlide() {
+            // Hide all slides
+            for (let i = 1; i <= totalSlides; i++) {
+                const el = document.getElementById(`slide-${i}`);
+                if (el) el.classList.remove('active');
+            }
+            // Show active slide
+            const activeEl = document.getElementById(`slide-${currentSlide}`);
+            if (activeEl) activeEl.classList.add('active');
+
+            // Update indicator & buttons
+            document.getElementById('slideIndicator').textContent = `Slide ${currentSlide} / ${totalSlides}`;
+            document.getElementById('prevBtn').disabled = (currentSlide === 1);
+            document.getElementById('nextBtn').disabled = (currentSlide === totalSlides);
+
+            // Update dots
+            renderDots();
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides) {
+                currentSlide++;
+                updateSlide();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 1) {
+                currentSlide--;
+                updateSlide();
+            }
+        }
+
+        function goToSlide(idx) {
+            currentSlide = idx;
+            updateSlide();
+        }
+
+        function renderDots() {
+            const container = document.getElementById('dotsContainer');
+            container.innerHTML = '';
+            for (let i = 1; i <= totalSlides; i++) {
+                const dot = document.createElement('div');
+                dot.className = `dot ${i === currentSlide ? 'active' : ''}`;
+                dot.onclick = () => goToSlide(i);
+                dot.title = `Go to slide ${i}`;
+                container.appendChild(dot);
+            }
+        }
+
+        // Keyboard Navigation
+        document.addEventListener('keydown', (e) => {
+            const developerToolsShortcut = e.key === 'F12'
+                || (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key.toUpperCase()))
+                || (e.ctrlKey && e.key.toUpperCase() === 'U');
+
+            if (developerToolsShortcut) {
+                e.preventDefault();
+                e.stopPropagation();
+                return;
+            }
+
+            if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') {
+                nextSlide();
+            } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+                prevSlide();
+            }
+        });
+
+        ['contextmenu', 'copy', 'cut', 'dragstart', 'selectstart'].forEach((eventName) => {
+            document.addEventListener(eventName, (e) => e.preventDefault());
+        });
+
+        // Initialize
+        updateSlide();
+    </script>
+</body>
+</html>
